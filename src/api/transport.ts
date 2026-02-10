@@ -1,7 +1,7 @@
 import { fetchJson } from "./http";
 import type { TransportSnapshot } from "../types";
 
-const defaultBase = "https://transport.rest";
+const defaultBase = "/api/transport";
 const baseUrl = (import.meta.env.VITE_TRANSPORT_API_BASE as string | undefined) ?? defaultBase;
 const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
 
@@ -11,7 +11,7 @@ export async function fetchTransport(city: string): Promise<TransportSnapshot> {
     return mockTransport;
   }
 
-  const locationsUrl = new URL(`${baseUrl}/locations`);
+  const locationsUrl = new URL(`${baseUrl}/locations`, window.location.origin);
   locationsUrl.searchParams.set("query", city);
   locationsUrl.searchParams.set("results", "1");
   locationsUrl.searchParams.set("type", "stop");
@@ -28,7 +28,7 @@ export async function fetchTransport(city: string): Promise<TransportSnapshot> {
   }
 
   const stopId = locationData[0].id;
-  const departuresUrl = new URL(`${baseUrl}/stops/${stopId}/departures`);
+  const departuresUrl = new URL(`${baseUrl}/stops/${stopId}/departures`, window.location.origin);
   departuresUrl.searchParams.set("duration", "90");
 
   const departuresData = await fetchJson<{

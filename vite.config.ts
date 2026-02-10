@@ -12,6 +12,12 @@ export default defineConfig({
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/openaq/, ""),
       },
+      "/api/transport": {
+        target: "https://v6.db.transport.rest",
+        changeOrigin: true,
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/transport/, ""),
+      },
     },
   },
 })

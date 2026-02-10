@@ -60,7 +60,7 @@ src/
 - Météo: Open-Meteo (sans clé)
 - Géocodage: Open-Meteo (sans clé)
 - Pollution: OpenAQ (clé requise)
-- Transports: transport.rest (peut être remplacée)
+- Transports: transport.rest (instance spécifique, peut être remplacée)
 - Événements: Ticketmaster (clé requise)
 
 ## Variables d'environnement
@@ -71,12 +71,15 @@ Copiez `.env.example` en `.env` et renseignez vos clés :
 VITE_USE_MOCKS=false
 VITE_TICKETMASTER_API_KEY=your_key_here
 VITE_OPENAQ_API_KEY=your_key_here
-VITE_TRANSPORT_API_BASE=https://transport.rest
+VITE_TRANSPORT_API_BASE=/api/transport
 ```
 
 ## Notes dev (CORS)
 OpenAQ v3 n'autorise pas les appels directs navigateur (CORS). En dev, Vite proxy `/api/openaq`
 vers `https://api.openaq.org`. Redémarrez `npm run dev` après modification.
+
+Transport REST bloque aussi le CORS sur l'instance publique. En dev, Vite proxy `/api/transport`
+vers `https://v6.db.transport.rest`. Vous pouvez changer l'instance via `VITE_TRANSPORT_API_BASE`.
 
 ## Lancer le projet
 

@@ -80,6 +80,8 @@ vers `https://api.openaq.org`. Redémarrez `npm run dev` après modification.
 
 Transport REST bloque aussi le CORS sur l'instance publique. En dev, Vite proxy `/api/transport`
 vers `https://v6.db.transport.rest`. Vous pouvez changer l'instance via `VITE_TRANSPORT_API_BASE`.
+Cette instance a un rate limit et une couverture géographique limitée. L'app réduit les retries et
+affiche un message si aucun arrêt n'est trouvé.
 
 ## Lancer le projet
 

@@ -4,7 +4,7 @@ export function Skeleton({ lines = 3 }: { lines?: number }) {
       {Array.from({ length: lines }).map((_, index) => (
         <div
           key={index}
-          className="h-4 w-full animate-pulse rounded-full bg-slate-200"
+          className="h-4 w-full animate-pulse rounded-full bg-slate-200 dark:bg-slate-700"
           style={{ width: `${80 - index * 10}%` }}
         />
       ))}

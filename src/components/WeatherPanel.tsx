@@ -24,7 +24,7 @@ export function WeatherPanel({
       />
     );
   }
-  if (!data) return <p className="text-sm text-slate-500">Sélectionnez une ville.</p>;
+  if (!data) return <p className="text-sm text-slate-500 dark:text-slate-400">Sélectionnez une ville.</p>;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -32,7 +32,7 @@ export function WeatherPanel({
       <Metric label="Ressenti" value={data.condition} />
       <Metric label="Vent" value={`${Math.round(data.windSpeed)} km/h`} />
       <Metric label="Pluie" value={`${Math.round(data.precipitationChance)}%`} />
-      <div className="md:col-span-2 rounded-2xl border border-slate-100 bg-white/60 p-4 text-sm text-slate-600">
+      <div className="md:col-span-2 rounded-2xl border border-slate-100 bg-white/60 p-4 text-sm text-slate-600 backdrop-blur transition-colors dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
         Max {Math.round(data.high)}°C · Min {Math.round(data.low)}°C
       </div>
     </div>

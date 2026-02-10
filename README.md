@@ -1,5 +1,7 @@
 # City Insights
 
+Développé par Zied RJEB
+
 City Insights est une application web moderne qui centralise des données temps réel (météo, transports, pollution, événements) pour une ville donnée. L'objectif est de démontrer la maîtrise des états asynchrones, de la résilience face aux APIs instables et d'une UX claire.
 
 ## Aperçu

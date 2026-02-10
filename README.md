@@ -74,6 +74,10 @@ VITE_OPENAQ_API_KEY=your_key_here
 VITE_TRANSPORT_API_BASE=https://transport.rest
 ```
 
+## Notes dev (CORS)
+OpenAQ v3 n'autorise pas les appels directs navigateur (CORS). En dev, Vite proxy `/api/openaq`
+vers `https://api.openaq.org`. Redémarrez `npm run dev` après modification.
+
 ## Lancer le projet
 
 ```

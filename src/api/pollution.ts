@@ -1,17 +1,31 @@
 import { fetchJson } from "./http";
 import type { PollutionSnapshot } from "../types";
 
-type OpenAQResponse = {
+type OpenAQLocationsResponse = {
   results: Array<{
-    measurements: Array<{
-      parameter: string;
-      value: number;
-      unit: string;
-    }>;
+    id: number;
   }>;
 };
 
-const BASE_URL = "https://api.openaq.org/v2/latest";
+type OpenAQSensorsResponse = {
+  results: Array<{
+    id: number;
+    parameter: {
+      name: string;
+      units: string;
+      displayName?: string | null;
+    };
+  }>;
+};
+
+type OpenAQLatestResponse = {
+  results: Array<{
+    value: number;
+    sensorsId: number;
+  }>;
+};
+
+const BASE_URL = "/api/openaq/v3";
 const OPENAQ_API_KEY = import.meta.env.VITE_OPENAQ_API_KEY as string | undefined;
 
 const pollutantLabels: Record<string, string> = {
@@ -24,21 +38,61 @@ const pollutantLabels: Record<string, string> = {
 };
 
 export async function fetchPollution(latitude: number, longitude: number): Promise<PollutionSnapshot> {
-  const url = new URL(BASE_URL);
-  url.searchParams.set("coordinates", `${latitude},${longitude}`);
-  url.searchParams.set("radius", "5000");
-  url.searchParams.set("limit", "100");
+  const headers = OPENAQ_API_KEY ? { "X-API-Key": OPENAQ_API_KEY } : undefined;
+  const locationsUrl = new URL(`${BASE_URL}/locations`, window.location.origin);
+  locationsUrl.searchParams.set("coordinates", `${latitude},${longitude}`);
+  locationsUrl.searchParams.set("radius", "5000");
+  locationsUrl.searchParams.set("limit", "1");
 
-  const data = await fetchJson<OpenAQResponse>(url.toString(), {
-    headers: OPENAQ_API_KEY ? { "X-API-Key": OPENAQ_API_KEY } : undefined,
-  });
-  const measurements = data.results?.[0]?.measurements ?? [];
+  const locationsData = await fetchJson<OpenAQLocationsResponse>(locationsUrl.toString(), { headers });
+  const locationId = locationsData.results?.[0]?.id;
 
-  const mapped = measurements.slice(0, 4).map((measurement) => ({
-    label: pollutantLabels[measurement.parameter] ?? measurement.parameter.toUpperCase(),
-    value: Math.round(measurement.value),
-    unit: measurement.unit,
-  }));
+  if (!locationId) {
+    return {
+      aqi: 50,
+      category: "Moderate",
+      dominantPollutant: "PM2.5",
+      measurements: [],
+    };
+  }
+
+  const sensorsUrl = new URL(`${BASE_URL}/locations/${locationId}/sensors`, window.location.origin);
+  sensorsUrl.searchParams.set("limit", "200");
+  const sensorsData = await fetchJson<OpenAQSensorsResponse>(sensorsUrl.toString(), { headers });
+  const sensorMap = new Map(
+    sensorsData.results.map((sensor) => [
+      sensor.id,
+      {
+        name: sensor.parameter.name,
+        displayName: sensor.parameter.displayName,
+        units: sensor.parameter.units,
+      },
+    ])
+  );
+
+  const latestUrl = new URL(`${BASE_URL}/locations/${locationId}/latest`, window.location.origin);
+  latestUrl.searchParams.set("limit", "100");
+  const latestData = await fetchJson<OpenAQLatestResponse>(latestUrl.toString(), { headers });
+
+  const measurements = latestData.results
+    .map((measurement) => {
+      const sensor = sensorMap.get(measurement.sensorsId);
+      if (!sensor) {
+        return null;
+      }
+      const label =
+        pollutantLabels[sensor.name] ??
+        sensor.displayName ??
+        sensor.name.toUpperCase();
+      return {
+        label,
+        value: Math.round(measurement.value),
+        unit: sensor.units,
+      };
+    })
+    .filter((measurement): measurement is { label: string; value: number; unit: string } => Boolean(measurement));
+
+  const mapped = measurements.slice(0, 4);
 
   const dominant = mapped[0]?.label ?? "PM2.5";
   const aqi = mapped[0]?.value ? Math.min(300, mapped[0].value * 5) : 50;

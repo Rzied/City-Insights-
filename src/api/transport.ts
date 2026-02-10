@@ -24,7 +24,11 @@ export async function fetchTransport(city: string): Promise<TransportSnapshot> {
   >(locationsUrl.toString());
 
   if (!locationData.length) {
-    return { departures: [] };
+    const error = new Error(
+      "Aucun arrêt trouvé pour cette ville (instance transport.rest limitée)."
+    ) as Error & { status?: number };
+    error.status = 404;
+    throw error;
   }
 
   const stopId = locationData[0].id;

@@ -110,7 +110,13 @@ export default function App() {
             showSuggestions={query.trim().length >= 2 && query !== selectedCity.name}
           />
           <div className="rounded-2xl border border-white/60 bg-white/80 p-4 shadow-glow backdrop-blur dark:border-white/10 dark:bg-white/5">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Ville active</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Ville active</p>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200/70 bg-emerald-50/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700 shadow-sm dark:border-emerald-400/40 dark:bg-emerald-400/10 dark:text-emerald-200">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+                Live
+              </span>
+            </div>
             <p className="mt-2 font-display text-2xl font-semibold text-ink dark:text-white">
               {selectedCity.name}
             </p>
